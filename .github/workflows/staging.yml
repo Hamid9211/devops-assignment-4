@@ -1,0 +1,102 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Backend Dependencies
+        run: |
+          cd News_Aggregator/backend
+          npm install
+
+      - name: Run Unit Tests
+        run: |
+          cd News_Aggregator/backend
+          npm test
+
+      - name: Run Linting
+        run: |
+          cd News_Aggregator/backend
+          npm run lint
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd News_Aggregator/frontend
+          npm install
+
+      - name: Build Frontend
+        run: |
+          cd News_Aggregator/frontend
+          npm run build
+
+      - name: Deploy to Staging EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST_STAGING }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY_STAGING }}
+          port: 22
+          script: |
+            cd ~/devops-assignment-4/News_Aggregator
+            git pull origin main
+            cd frontend
+            npm install
+            npm run build
+            cd ../backend
+            npm install
+            pm2 restart news-backend
+            sudo systemctl restart nginx
+
+      - name: Send Success Email
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "✅ Deployment Successful - Staging Environment"
+          to: ${{ secrets.INSTRUCTOR_EMAIL }}
+          from: ${{ secrets.EMAIL_USER }}
+          body: |
+            Deployment to Staging Environment was successful!
+            
+            Access the app at: http://${{ secrets.EC2_HOST_STAGING }}
+            
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Triggered by: ${{ github.actor }}
+
+      - name: Send Failure Email
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "❌ Deployment Failed - Staging Environment"
+          to: ${{ secrets.INSTRUCTOR_EMAIL }}
+          from: ${{ secrets.EMAIL_USER }}
+          body: |
+            Deployment to Staging Environment FAILED!
+            
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Triggered by: ${{ github.actor }}
+            
+            Please check GitHub Actions logs for details.
