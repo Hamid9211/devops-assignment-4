@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install Backend Dependencies
         run: |
@@ -67,10 +67,11 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 465
+          secure: true
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "✅ Deployment Successful - Staging Environment"
-          to: ${{ secrets.INSTRUCTOR_EMAIL }}
+          to: ${{ secrets.INSTRUCTOR_EMAIL }},${{ secrets.DEVELOPER_EMAIL }}
           from: ${{ secrets.EMAIL_USER }}
           body: |
             Deployment to Staging Environment was successful!
@@ -87,18 +88,18 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 465
+          secure: true
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "❌ Deployment Failed - Testing Environment"
-          to: ${{ secrets.INSTRUCTOR_EMAIL }},${{ secrets.EMAIL_USER }}
+          to: ${{ secrets.INSTRUCTOR_EMAIL }},${{ secrets.DEVELOPER_EMAIL }}
           from: ${{ secrets.EMAIL_USER }}
           body: |
             Deployment to Testing Environment FAILED!
             
-            Branch: ${{ github.head_ref }}
+            Branch: ${{ github.ref_name }}
             Commit: ${{ github.sha }}
             Triggered by: ${{ github.actor }}
-            Pull Request Author: ${{ github.actor }}
             
             Please check GitHub Actions logs for details:
             ${{ github.server_url }}/${{ github.repository }}/actions
