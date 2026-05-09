@@ -89,7 +89,7 @@ jobs:
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "❌ Deployment Failed - Testing Environment"
-          to: ${{ secrets.INSTRUCTOR_EMAIL }}
+          to: ${{ secrets.INSTRUCTOR_EMAIL }},${{ secrets.EMAIL_USER }}
           from: ${{ secrets.EMAIL_USER }}
           body: |
             Deployment to Testing Environment FAILED!
@@ -97,5 +97,7 @@ jobs:
             Branch: ${{ github.head_ref }}
             Commit: ${{ github.sha }}
             Triggered by: ${{ github.actor }}
+            Pull Request Author: ${{ github.actor }}
             
-            Please check GitHub Actions logs for details.
+            Please check GitHub Actions logs for details:
+            ${{ github.server_url }}/${{ github.repository }}/actions
