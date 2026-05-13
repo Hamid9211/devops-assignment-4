@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const sequelize = require('./config/db');
 
-// Route modules
+
 const authRoutes = require('./routes/auth.routes');
 const articleRoutes = require('./routes/article.routes');
 const bookmarkRoutes = require('./routes/bookmark.routes');
@@ -27,7 +27,6 @@ app.use(cors({
 
 app.use(express.json());
 
-// Register routes
 app.use('/api/auth', authRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/bookmarks', bookmarkRoutes);
