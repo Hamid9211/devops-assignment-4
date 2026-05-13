@@ -52,7 +52,12 @@ jobs:
           port: 22
           script: |
             cd ~/devops-assignment-4/News_Aggregator
-            git pull origin main
+            
+            # Fetch all branches and pull the specific feature branch triggering the PR
+            git fetch origin
+            git checkout ${{ github.head_ref }}
+            git pull origin ${{ github.head_ref }}
+            
             cd frontend
             npm install
             npm run build
@@ -76,7 +81,7 @@ jobs:
           body: |
             Deployment to Testing Environment was successful!
             
-            Access the app at: http://${{ secrets.EC2_HOST_TESTING }}
+            QA can access the app at: http://${{ secrets.EC2_HOST_TESTING }}
             
             Branch: ${{ github.head_ref }}
             Commit: ${{ github.sha }}
@@ -91,7 +96,7 @@ jobs:
           secure: true
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "❌ Deployment Failed - Testing Environment"
+          subject: "Deployment Failed - Testing Environment"
           to: ${{ secrets.INSTRUCTOR_EMAIL }},${{ secrets.DEVELOPER_EMAIL }}
           from: ${{ secrets.EMAIL_USER }}
           body: |
