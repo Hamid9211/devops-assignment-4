@@ -52,7 +52,11 @@ jobs:
           port: 22
           script: |
             cd ~/devops-assignment-4/News_Aggregator
+            
+            # Since this triggers on merge to main, we pull main directly
+            git checkout main
             git pull origin main
+            
             cd frontend
             npm install
             npm run build
@@ -76,7 +80,7 @@ jobs:
           body: |
             Deployment to Staging Environment was successful!
             
-            Access the app at: http://${{ secrets.EC2_HOST_STAGING }}
+            Clients and Team can access the app at: http://${{ secrets.EC2_HOST_STAGING }}
             
             Branch: ${{ github.ref_name }}
             Commit: ${{ github.sha }}
@@ -91,11 +95,11 @@ jobs:
           secure: true
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "❌ Deployment Failed - Testing Environment"
+          subject: "Deployment Failed - Staging Environment"
           to: ${{ secrets.INSTRUCTOR_EMAIL }},${{ secrets.DEVELOPER_EMAIL }}
           from: ${{ secrets.EMAIL_USER }}
           body: |
-            Deployment to Testing Environment FAILED!
+            Deployment to Staging Environment FAILED!
             
             Branch: ${{ github.ref_name }}
             Commit: ${{ github.sha }}
