@@ -97,7 +97,7 @@ jobs:
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "Deployment Failed - Testing Environment"
-          to: ${{ secrets.INSTRUCTOR_EMAIL }},${{ secrets.DEVELOPER_EMAIL }}
+          to: ${{ secrets.DEVELOPER_EMAIL }}
           from: ${{ secrets.EMAIL_USER }}
           body: |
             Deployment to Testing Environment FAILED!
